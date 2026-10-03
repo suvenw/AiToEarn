@@ -1,0 +1,34 @@
+services:
+  # === 后端：本地构建 ===
+  aitoearn-ai:
+    build:
+      context: ./project/aitoearn-backend
+      dockerfile: apps/aitoearn-ai/Dockerfile
+    image: aitoearn-local/aitoearn-ai:latest
+    pull_policy: never
+
+  aitoearn-server:
+    build:
+      context: ./project/aitoearn-backend
+      dockerfile: apps/aitoearn-server/Dockerfile
+    image: aitoearn-local/aitoearn-server:latest
+    pull_policy: never
+
+  aitoearn-web:
+    build:
+      context: ./project/aitoearn-web
+      dockerfile: Dockerfile
+    image: aitoearn-local/aitoearn-web:latest
+    pull_policy: never
+    # 覆盖原 compose 中强制要求 AUTO_LOGIN_TOKEN 的命令；token 缺失时静默继续
+    command:
+      - /bin/sh
+      - -c
+      - |
+        AUTO_LOGIN_TOKEN=$$(cat /data/init/token.txt 2>/dev/null || true)
+        if [ -n "$$AUTO_LOGIN_TOKEN" ]; then
+          export AUTO_LOGIN_TOKEN
+        else
+          export NEXT_PUBLIC_AUTO_LOGIN=0
+        fi
+        exec node server.js
