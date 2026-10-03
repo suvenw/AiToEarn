@@ -33,7 +33,16 @@ export class UserService {
     id: string,
     newdData: UpdateUserInfoDto,
   ): Promise<boolean> {
-    const res = await this.userRepository.updateById(id, { $set: newdData })
+    const update: Record<string, unknown> = {}
+    if (newdData.name !== undefined) update['name'] = newdData.name
+    if (newdData.avatar !== undefined) update['avatar'] = newdData.avatar
+    if (newdData.bio !== undefined) update['bio'] = newdData.bio
+    if (newdData.phone !== undefined) {
+      update['phone'] = newdData.phone
+      update['phoneCountryCode'] = newdData.phoneCountryCode || '+86'
+    }
+    if (Object.keys(update).length === 0) return true
+    const res = await this.userRepository.updateById(id, { $set: update })
     return res !== null
   }
 

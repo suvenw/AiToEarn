@@ -10,8 +10,19 @@ import { UserType } from '@yikart/mongodb'
 import { z } from 'zod'
 
 const UpdateUserInfoSchema = z.object({
-  name: z.string({ message: '昵称' }).optional(),
-  avatar: z.string({ message: '头像' }).optional(),
+  name: z.string().min(1).max(50).optional().describe('昵称'),
+  avatar: z.string().optional().describe('头像 URL'),
+  bio: z.string().max(500).optional().describe('个人简介'),
+  phone: z
+    .string()
+    .regex(/^1[3-9]\d{9}$/, 'Invalid phone number')
+    .optional()
+    .describe('手机号'),
+  phoneCountryCode: z
+    .string()
+    .regex(/^\+\d{1,4}$/)
+    .optional()
+    .describe('手机号国家代码'),
 })
 
 export class UpdateUserInfoDto extends createZodDto(UpdateUserInfoSchema) {}

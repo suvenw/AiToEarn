@@ -32,6 +32,12 @@ export enum ResponseCode {
   UserNotFound = 12000,
   UserStorageExceeded = 12002,
   UserStatusError = 12003,
+  InvalidCredentials = 12004,
+  AccountAlreadyExists = 12005,
+  PhoneAlreadyBound = 12006,
+  PasswordTooWeak = 12007,
+  AccountLocked = 12008,
+  AccountNotSet = 12009,
 
   // 12300-12399: ai（AI 模块）
   InvalidModel = 12300,

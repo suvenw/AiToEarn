@@ -1,6 +1,6 @@
 /**
  * LoginContent - 登录页面内容组件
- * 邮箱验证码登录
+ * 支持邮箱验证码、手机号（验证码 / 密码）、账号密码登录、注册
  */
 
 'use client'
@@ -15,7 +15,7 @@ import { useTransClient } from '@/app/i18n/client'
 import logo from '@/assets/images/logo.png'
 import { useUserStore } from '@/store/user'
 
-import { EmailLoginForm } from './EmailLoginForm'
+import { LoginMethodTabs } from './LoginMethodTabs'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 10 },
@@ -69,7 +69,7 @@ export default function LoginContent() {
           initial="initial"
           animate="animate"
           transition={{ duration: 0.2 }}
-          className="w-full max-w-[400px]"
+          className="w-full max-w-[440px]"
         >
           {/* 中心 Logo */}
           <div className="mb-8 flex flex-col items-center">
@@ -89,8 +89,8 @@ export default function LoginContent() {
             <p className="mt-2 text-muted-foreground">{t('loginSubtitle')}</p>
           </div>
 
-          {/* 登录表单 */}
-          <EmailLoginForm />
+          {/* 登录表单（多 Tab） */}
+          <LoginMethodTabs />
         </motion.div>
 
         {/* 底部条款 */}

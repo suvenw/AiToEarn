@@ -1,4 +1,4 @@
-import type { AuthRequestOptions, CodeLoginResponse, EmailCodeLoginParams, GoogleLoginParams, LoginResponse, PhoneCodeLoginParams, SendEmailCodeParams, SendPhoneCodeParams, UpdateUserInfoParams } from './auth.types'
+import type { AuthRequestOptions, CodeLoginResponse, EmailCodeLoginParams, GoogleLoginParams, LoginByAccountParams, LoginByPhoneParams, LoginResponse, PhoneCodeLoginParams, RegisterByAccountParams, RegisterByPhoneParams, SendEmailCodeParams, SendPhoneCodeParams, UpdatePasswordParams, UpdateUserInfoParams } from './auth.types'
 import type { UserInfo } from '@/store/user'
 import type { RequestOptions } from '@/utils/request'
 import http from '@/utils/request'
@@ -46,4 +46,29 @@ export function updateUserInfoApi(data: UpdateUserInfoParams) {
  */
 export function googleLoginApi(data: GoogleLoginParams) {
   return http.post<LoginResponse>('login/google', data)
+}
+
+/** 账号密码注册 */
+export function registerByAccountApi(data: RegisterByAccountParams) {
+  return http.post<LoginResponse>('auth/register/account', data)
+}
+
+/** 手机号密码注册 */
+export function registerByPhoneApi(data: RegisterByPhoneParams) {
+  return http.post<LoginResponse>('auth/register/phone', data)
+}
+
+/** 账号密码登录 */
+export function accountPasswordLoginApi(data: LoginByAccountParams) {
+  return http.post<LoginResponse>('auth/login/account', data)
+}
+
+/** 手机号密码登录 */
+export function phonePasswordLoginApi(data: LoginByPhoneParams) {
+  return http.post<LoginResponse>('auth/login/phone', data)
+}
+
+/** 修改密码 */
+export function updatePasswordApi(data: UpdatePasswordParams) {
+  return http.put<void>('auth/password', data)
 }

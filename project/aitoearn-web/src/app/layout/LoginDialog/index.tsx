@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation'
 import { memo, useCallback } from 'react'
 import { useShallow } from 'zustand/shallow'
 
-import { EmailLoginForm } from '@/app/[lng]/auth/login/components/LoginContent/EmailLoginForm'
+import { LoginMethodTabs } from '@/app/[lng]/auth/login/components/LoginContent/LoginMethodTabs'
 import { useTransClient } from '@/app/i18n/client'
 import logo from '@/assets/images/logo.png'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
@@ -89,10 +89,11 @@ const LoginDialogContent = memo(() => {
 
         {/* 登录表单 */}
         <div className="px-2">
-          <EmailLoginForm
+          <LoginMethodTabs
             onLoginSuccess={handleLoginSuccess}
             redirectUrl={redirectUrl}
             inviteCode={inviteCode}
+            variant="dialog"
           />
         </div>
 

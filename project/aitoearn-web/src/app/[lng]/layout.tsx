@@ -54,7 +54,11 @@ export default async function RootLayout({
   params: Promise<{ lng: string }>
 }>) {
   const { lng } = await params
-  const autoLoginToken = process.env.AUTO_LOGIN_TOKEN?.trim() || undefined
+  // 自动登录默认关闭；需显式开启 NEXT_PUBLIC_AUTO_LOGIN=1 才会注入容器自带的 JWT
+  const autoLoginEnabled = process.env.NEXT_PUBLIC_AUTO_LOGIN === '1'
+  const autoLoginToken = autoLoginEnabled
+    ? process.env.AUTO_LOGIN_TOKEN?.trim() || undefined
+    : undefined
 
   return (
     <html lang={lng} dir={dir(lng)} suppressHydrationWarning>

@@ -75,3 +75,48 @@ export interface UpdateUserInfoParams {
   name: string
   avatar?: string
 }
+
+/**
+ * 账号密码注册请求参数。
+ */
+export interface RegisterByAccountParams {
+  account: string
+  password: string
+  mail?: string
+  phone?: string
+  phoneCountryCode?: string
+}
+
+/**
+ * 手机号密码注册请求参数。
+ */
+export interface RegisterByPhoneParams {
+  phone: string
+  phoneCountryCode: string
+  password: string
+}
+
+/**
+ * 账号密码登录请求参数。
+ */
+export interface LoginByAccountParams {
+  account: string
+  password: string
+}
+
+/**
+ * 手机号密码登录请求参数。
+ */
+export interface LoginByPhoneParams {
+  phone: string
+  phoneCountryCode: string
+  password: string
+}
+
+/**
+ * 修改密码请求参数。
+ */
+export interface UpdatePasswordParams {
+  oldPassword: string
+  newPassword: string
+}

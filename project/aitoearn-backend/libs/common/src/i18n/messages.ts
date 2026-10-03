@@ -81,6 +81,30 @@ export const messages: Record<ResponseCode, Record<Locale, MessageValue>> = {
     'en-US': 'User status error',
     'zh-CN': '用户状态错误',
   },
+  [ResponseCode.InvalidCredentials]: {
+    'en-US': 'Incorrect account or password',
+    'zh-CN': '账号或密码错误',
+  },
+  [ResponseCode.AccountAlreadyExists]: {
+    'en-US': 'Account already exists',
+    'zh-CN': '账号已存在',
+  },
+  [ResponseCode.PhoneAlreadyBound]: {
+    'en-US': 'Phone is already bound to another account',
+    'zh-CN': '该手机号已绑定其他账号',
+  },
+  [ResponseCode.PasswordTooWeak]: {
+    'en-US': 'Password too weak',
+    'zh-CN': '密码强度不足',
+  },
+  [ResponseCode.AccountLocked]: {
+    'en-US': 'Account is temporarily locked, please try again later',
+    'zh-CN': '账号暂时被锁定，请稍后再试',
+  },
+  [ResponseCode.AccountNotSet]: {
+    'en-US': 'No password is set for this account',
+    'zh-CN': '该账号尚未设置密码',
+  },
 
   // 12300 (ai)
   [ResponseCode.InvalidModel]: {

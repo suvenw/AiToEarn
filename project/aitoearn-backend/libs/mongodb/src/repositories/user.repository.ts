@@ -23,6 +23,26 @@ export class UserRepository extends BaseRepository<User> {
     return userInfo as LeanDoc<User> | null
   }
 
+  async getByAccount(account: string): Promise<LeanDoc<User> | null> {
+    return this.findOne({ account, isDelete: { $ne: true } })
+  }
+
+  async getByMail(mail: string): Promise<LeanDoc<User> | null> {
+    return this.findOne({ mail, isDelete: { $ne: true } })
+  }
+
+  async getByPhone(phone: string): Promise<LeanDoc<User> | null> {
+    return this.findOne({ phone, isDelete: { $ne: true } })
+  }
+
+  async countByAccount(account: string): Promise<number> {
+    return this.count({ account, isDelete: { $ne: true } })
+  }
+
+  async countByPhone(phone: string): Promise<number> {
+    return this.count({ phone, isDelete: { $ne: true } })
+  }
+
   async updateAiConfigById(userId: string, aiConfig: Partial<UserAiInfo>): Promise<boolean> {
     const res = await this.model.updateOne(
       { _id: userId },
@@ -46,6 +66,49 @@ export class UserRepository extends BaseRepository<User> {
     const res = await this.model.updateOne(
       { _id: userId },
       { $set: { userType } },
+    )
+    return res.modifiedCount > 0
+  }
+
+  async updatePasswordHashById(userId: string, passwordHash: string, passwordAlgo: string): Promise<boolean> {
+    const res = await this.model.updateOne(
+      { _id: userId },
+      {
+        $set: {
+          passwordHash,
+          passwordAlgo,
+          passwordUpdatedAt: new Date(),
+          failedLoginAttempts: 0,
+          lockedUntil: null,
+        },
+      },
+    )
+    return res.modifiedCount > 0
+  }
+
+  async updatePhoneById(userId: string, phone: string, phoneCountryCode: string): Promise<boolean> {
+    const res = await this.model.updateOne(
+      { _id: userId },
+      { $set: { phone, phoneCountryCode } },
+    )
+    return res.modifiedCount > 0
+  }
+
+  async updateAccountById(userId: string, account: string): Promise<boolean> {
+    const res = await this.model.updateOne(
+      { _id: userId },
+      { $set: { account } },
+    )
+    return res.modifiedCount > 0
+  }
+
+  async updateFailedLoginById(userId: string, failedLoginAttempts: number, lockedUntil?: Date | null): Promise<boolean> {
+    const update: Record<string, unknown> = { failedLoginAttempts }
+    if (lockedUntil !== undefined)
+      update['lockedUntil'] = lockedUntil
+    const res = await this.model.updateOne(
+      { _id: userId },
+      { $set: update },
     )
     return res.modifiedCount > 0
   }

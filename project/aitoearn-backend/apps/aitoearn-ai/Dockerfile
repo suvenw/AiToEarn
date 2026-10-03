@@ -12,7 +12,7 @@ FROM node:24-alpine AS production
 
 ARG APP_NAME
 
-RUN apk add --no-cache curl ffmpeg
+RUN apk add --no-cache curl ffmpeg vips vips-dev
 RUN npm install -g pm2
 
 WORKDIR /app
@@ -25,5 +25,6 @@ COPY libs/ ./libs/
 
 ENV NODE_ENV=production
 ENV APP_NAME=$APP_NAME
+ENV LD_LIBRARY_PATH=/app/node_modules/@img/sharp-libvips-linuxmusl-arm64/lib:/app/node_modules/@img/sharp-linuxmusl-arm64/node_modules/@img/sharp-libvips-linuxmusl-arm64/lib
 
 CMD ["sh", "-c", "echo 'nameserver 8.8.8.8' >> /etc/resolv.conf && echo 'nameserver 1.1.1.1' >> /etc/resolv.conf && exec pm2-runtime start apps/${APP_NAME}/src/main.js --name ${APP_NAME} -- -c config.yaml"]

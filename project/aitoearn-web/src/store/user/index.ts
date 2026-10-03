@@ -10,12 +10,14 @@ export interface UserInfo {
   name: string
   password: string
   phone?: string
+  phoneCountryCode?: string
   mail: string
   salt: string
   status: number
   updateTime: string
   _id: string
   avatar?: string
+  bio?: string
   score?: number
   income?: number
   popularizeCode?: string
@@ -96,6 +98,26 @@ export const useUserStore = createPersistStore(
           set({ userInfo: res.data })
           return res.data
         }
+      },
+      /**
+       * 退出登录：清空 token、用户信息、账户信息，并刷新页面以重置内存中的全局状态。
+       */
+      logout() {
+        set({
+          token: undefined,
+          userInfo: {},
+          hasEverLoggedIn: false,
+          creditsBalance: 0,
+          creditsInitialized: false,
+          seedanceCreditsBalance: 0,
+          seedanceCreditsAvailableBalance: 0,
+          seedanceCreditsInitialized: false,
+        })
+        // 同步清理其他持久化状态（账号、积分等）
+        try {
+          localStorage.removeItem('User')
+        }
+        catch {}
       },
       async fetchCreditsBalance() {
         set({ creditsInitialized: true })

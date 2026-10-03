@@ -105,6 +105,55 @@ export class User extends WithTimestampSchema {
 
   @Prop({
     required: false,
+    unique: true,
+    sparse: true,
+  })
+  account?: string
+
+  @Prop({
+    required: false,
+    unique: true,
+    sparse: true,
+  })
+  phone?: string
+
+  @Prop({
+    required: false,
+    default: '+86',
+  })
+  phoneCountryCode?: string
+
+  @Prop({
+    required: false,
+  })
+  passwordHash?: string
+
+  @Prop({
+    required: false,
+    default: 'bcrypt',
+  })
+  passwordAlgo?: string
+
+  @Prop({
+    required: false,
+    type: Date,
+  })
+  passwordUpdatedAt?: Date
+
+  @Prop({
+    required: false,
+    default: 0,
+  })
+  failedLoginAttempts?: number
+
+  @Prop({
+    required: false,
+    type: Date,
+  })
+  lockedUntil?: Date
+
+  @Prop({
+    required: false,
   })
   avatar?: string
 

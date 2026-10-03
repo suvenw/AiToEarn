@@ -11,15 +11,17 @@ logger:
 appDomain: localhost
 environment: production
 auth:
-  secret: change-this-jwt-secret
-  internalToken: change-this-secret-token
+  secret: 576ead19e288fd13ae44cf30a100508f671f159515ab476900ba441bb7ed224e14edc9323170019708bfbfe5f362796f
+  internalToken: ce5cb74f18ea0cbd50fc67b2779a224025073d9b3160799cc4a24110565918cd
+  passwordHashRounds: 10
+  tokenTtl: 7d
 apiKey:
   prefix: ai_
 redis:
   host: redis
   port: 6379
-  username: default
-  password: password
+  username: "default"
+  password: "password"
 mongodb:
   uri: mongodb://admin:password@mongodb:27017/?authSource=admin&directConnection=true
   dbName: aitoearn
@@ -27,8 +29,8 @@ redlock:
   redis:
     host: redis
     port: 6379
-    username: default
-    password: password
+    username: "default"
+    password: "password"
   ttl: 300
   retryDelay: 1000
   retryCount: 3
@@ -45,7 +47,7 @@ assets:
   provider: s3
 aiClient:
   baseUrl: http://aitoearn-ai:3010
-  token: change-this-secret-token
+  token: ce5cb74f18ea0cbd50fc67b2779a224025073d9b3160799cc4a24110565918cd
 channel:
   channelDb:
     uri: mongodb://admin:password@mongodb:27017/?authSource=admin&directConnection=true

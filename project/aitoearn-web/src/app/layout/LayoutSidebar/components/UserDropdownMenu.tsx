@@ -12,17 +12,28 @@ import {
   BookOpen,
   ChevronRight,
   FileText,
+  LogOut,
   ScrollText,
   Settings,
   Shield,
+  UserCircle,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useTransClient } from '@/app/i18n/client'
 import { DOCS_URL, GITHUB_REPO } from '@/app/layout/shared/constants'
 import { useGitHubStars } from '@/app/layout/shared/hooks/useGitHubStars'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -102,9 +113,13 @@ function MenuItem({
 function LoggedInMenuContent({
   onOpenSettings,
   onClose,
+  onOpenProfile,
+  onConfirmLogout,
 }: {
   onOpenSettings: (defaultTab?: SettingsTab) => void
   onClose: () => void
+  onOpenProfile: () => void
+  onConfirmLogout: () => void
 }) {
   const { t } = useTransClient(['common'])
   const userInfo = useUserStore(state => state.userInfo)
@@ -112,6 +127,11 @@ function LoggedInMenuContent({
 
   const handleOpenSettings = () => {
     onOpenSettings()
+    onClose()
+  }
+
+  const handleOpenProfile = () => {
+    onOpenProfile()
     onClose()
   }
 
@@ -136,8 +156,22 @@ function LoggedInMenuContent({
             >
               {userInfo?.name || t('common:unknownUser')}
             </span>
+            {userInfo?.bio && (
+              <span className="truncate text-xs text-muted-foreground">
+                {userInfo.bio}
+              </span>
+            )}
           </div>
         </div>
+
+        <div className="my-1 h-px bg-border" />
+
+        {/* 高频：个人资料 */}
+        <MenuItem
+          icon={UserCircle}
+          label={t('common:profile')}
+          onClick={handleOpenProfile}
+        />
 
         <div className="my-1 h-px bg-border" />
 
@@ -160,7 +194,7 @@ function LoggedInMenuContent({
             <ChevronRight size={14} className="text-muted-foreground" />
           </div>
           {/* 右侧飞出面板 */}
-          <div className="invisible absolute left-full top-0 z-50 pl-1 opacity-0 transition-all group-hover/docs:visible group-hover/docs:opacity-100">
+          <div className="invisible absolute left-full top-0 z-50 pl-1 opacity-0 transition-all group-hover-docs:visible group-hover-docs:opacity-100">
             <div className="w-48 rounded-md border bg-popover p-1 shadow-md">
               <MenuItem icon={FileText} label={t('common:helpDocs')} href={DOCS_URL} external />
               <MenuItem
@@ -183,10 +217,20 @@ function LoggedInMenuContent({
         </div>
         <div className="my-1 h-px bg-border" />
 
-        {/* 高频：设置 */}
+        {/* 设置 */}
         <div data-testid="sidebar-settings-entry">
           <MenuItem icon={Settings} label={t('common:settings')} onClick={handleOpenSettings} />
         </div>
+
+        <div className="my-1 h-px bg-border" />
+
+        {/* 退出登录 */}
+        <MenuItem
+          icon={LogOut}
+          label={t('common:logout')}
+          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+          onClick={onConfirmLogout}
+        />
       </div>
     </>
   )
@@ -195,9 +239,25 @@ function LoggedInMenuContent({
 export function UserDropdownMenu({ collapsed, onOpenSettings }: UserDropdownMenuProps) {
   const token = useUserStore(state => state.token)
   const userInfo = useUserStore(state => state.userInfo)
+  const logout = useUserStore(state => state.logout)
   const hasHydrated = useUserStore(state => state._hasHydrated)
   const { t } = useTransClient('common')
+  const router = useRouter()
   const [open, setOpen] = useState(false)
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false)
+
+  const handleOpenProfile = () => {
+    router.push(`/${(userInfo as any)?.lang || 'zh-CN'}/profile`)
+  }
+
+  const handleConfirmLogout = () => {
+    logout()
+    setOpen(false)
+    setLogoutDialogOpen(false)
+    // 跳转到首页（带登录弹框）
+    router.push('/zh-CN')
+    router.refresh()
+  }
 
   // 如果还未 hydrate 完成，显示骨架屏
   if (!hasHydrated) {
@@ -305,9 +365,35 @@ export function UserDropdownMenu({ collapsed, onOpenSettings }: UserDropdownMenu
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
         >
-          <LoggedInMenuContent onOpenSettings={onOpenSettings} onClose={() => setOpen(false)} />
+          <LoggedInMenuContent
+            onOpenSettings={onOpenSettings}
+            onClose={() => setOpen(false)}
+            onOpenProfile={handleOpenProfile}
+            onConfirmLogout={() => {
+              setOpen(false)
+              setLogoutDialogOpen(true)
+            }}
+          />
         </PopoverContent>
       </Popover>
+
+      {/* 退出登录确认弹框 */}
+      <Dialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('common:logoutConfirmTitle')}</DialogTitle>
+            <DialogDescription>{t('common:logoutConfirmDesc')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setLogoutDialogOpen(false)}>
+              {t('common:cancel')}
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmLogout}>
+              {t('common:logout')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
