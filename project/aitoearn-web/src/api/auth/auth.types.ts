@@ -74,6 +74,9 @@ export interface AuthRequestOptions {
 export interface UpdateUserInfoParams {
   name: string
   avatar?: string
+  bio?: string
+  phone?: string
+  phoneCountryCode?: string
 }
 
 /**
