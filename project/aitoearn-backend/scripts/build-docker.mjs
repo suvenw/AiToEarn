@@ -253,7 +253,12 @@ async function buildImage(projectName, contextDir, options = {}) {
 
   try {
     // 构建镜像并打所有 tag
-    await $({ cwd: contextDir })`docker buildx build --build-arg APP_NAME=${projectName} --platform ${platformStr} -t ${localImageName} ${tagArgs} ${pushArgs} .`
+    const baseImage = process.env.BASE_IMAGE
+    const buildArgs = [`--build-arg APP_NAME=${projectName}`]
+    if (baseImage) {
+      buildArgs.push(`--build-arg BASE_IMAGE=${baseImage}`)
+    }
+    await $({ cwd: contextDir })`docker buildx build ${buildArgs} --platform ${platformStr} -t ${localImageName} ${tagArgs} ${pushArgs} .`
     console.info(chalk.green(`Docker 镜像构建完成:`))
     if (!push) {
       console.info(chalk.gray(`  本地: ${localImageName}`))
