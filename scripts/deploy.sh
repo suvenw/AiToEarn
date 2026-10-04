@@ -22,6 +22,19 @@ fi
 
 set -euo pipefail
 
+# === 颜色输出（必须先于 log 等函数定义） ===
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+log()   { echo -e "${BLUE}[$(date +%H:%M:%S)]${NC} $*"; }
+ok()    { echo -e "${GREEN}✓${NC} $*"; }
+warn()  { echo -e "${YELLOW}!${NC} $*"; }
+err()   { echo -e "${RED}✗${NC} $*" >&2; }
+die()   { err "$*"; exit 1; }
+
 # === 路径与常量 ===
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -55,19 +68,6 @@ fi
 export BASE_IMAGE
 log "宿主架构: $HOST_ARCH  →  Docker platform: $DOCKER_PLATFORM"
 log "Docker 基础镜像: $BASE_IMAGE  (alpine / debian / ubuntu)"
-
-# === 颜色输出 ===
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-log()   { echo -e "${BLUE}[$(date +%H:%M:%S)]${NC} $*"; }
-ok()    { echo -e "${GREEN}✓${NC} $*"; }
-warn()  { echo -e "${YELLOW}!${NC} $*"; }
-err()   { echo -e "${RED}✗${NC} $*" >&2; }
-die()   { err "$*"; exit 1; }
 
 # === 参数解析 ===
 SKIP_BUILD=false
