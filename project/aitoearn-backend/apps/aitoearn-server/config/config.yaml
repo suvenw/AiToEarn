@@ -20,15 +20,15 @@ apiKey:
 redis:
   host: redis
   port: 6379
-  password: "AitoearnRedis2026"
+  password: "password"
 mongodb:
-  uri: mongodb://admin:AitoeanMongo2026@mongodb:27017/?authSource=admin&directConnection=true
+  uri: mongodb://admin:password@mongodb:27017/?authSource=admin&directConnection=true
   dbName: aitoearn
 redlock:
   redis:
     host: redis
     port: 6379
-    password: "AitoearnRedis2026"
+    password: "password"
   ttl: 300
   retryDelay: 1000
   retryCount: 3
@@ -48,7 +48,7 @@ aiClient:
   token: ce5cb74f18ea0cbd50fc67b2779a224025073d9b3160799cc4a24110565918cd
 channel:
   channelDb:
-    uri: mongodb://admin:AitoeanMongo2026@mongodb:27017/?authSource=admin&directConnection=true
+    uri: mongodb://admin:password@mongodb:27017/?authSource=admin&directConnection=true
     dbName: aitoearn_channel
   shortLink:
     baseUrl: https://localhost/api/shortLink/

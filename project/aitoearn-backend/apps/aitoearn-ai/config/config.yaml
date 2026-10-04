@@ -15,15 +15,15 @@ auth:
 redis:
   host: redis
   port: 6379
-  password: "AitoearnRedis2026"
+  password: "password"
 mongodb:
-  uri: mongodb://admin:AitoeanMongo2026@mongodb:27017/?authSource=admin&directConnection=true
+  uri: mongodb://admin:password@mongodb:27017/?authSource=admin&directConnection=true
   dbName: aitoearn
 redlock:
   redis:
     host: redis
     port: 6379
-    password: "AitoearnRedis2026"
+    password: "password"
   ttl: 300
   retryDelay: 1000
   retryCount: 3

@@ -59,6 +59,8 @@ case "$HOST_ARCH" in
   aarch64|arm64) DOCKER_PLATFORM="linux/arm64" ;;
   *) DOCKER_PLATFORM="linux/amd64" ;;
 esac
+# 显式 export，避免子 shell / set -u 在某些极端情况下看不到这个变量
+export DOCKER_PLATFORM
 
 # 探测首选基础镜像（默认 alpine，可通过 .env 覆盖）
 BASE_IMAGE="${BASE_IMAGE:-alpine}"
@@ -67,7 +69,7 @@ if grep -q '^BASE_IMAGE=' "$ENV_FILE" 2>/dev/null; then
 fi
 export BASE_IMAGE
 log "宿主架构: $HOST_ARCH  →  Docker platform: $DOCKER_PLATFORM"
-log "Docker 基础镜像: $BASE_IMAGE  (alpine / debian / ubuntu)"
+log "Docker 基础镜像: ${BASE_IMAGE:-alpine}  (alpine / debian / ubuntu)"
 
 # === 参数解析 ===
 SKIP_BUILD=false
@@ -156,25 +158,25 @@ fi
 # === 构建 ===
 if ! $SKIP_BUILD; then
   log "安装后端依赖（可能需要几分钟）..."
-  # 实时输出 pnpm 进度；--prod 跳过 devDependencies（Docker 构建产物不需要），大幅提速
-  (cd "$BACKEND_DIR" && pnpm install --prod --frozen-lockfile=false)
+  # 必须保留 devDependencies：build-docker.mjs 依赖 zx/chalk/commander 等开发期工具
+  (cd "$BACKEND_DIR" && pnpm install --frozen-lockfile=false)
 
-  log "构建 aitoearn-server 镜像（$DOCKER_PLATFORM，base=$BASE_IMAGE）..."
-  (cd "$BACKEND_DIR" && node scripts/build-docker.mjs aitoearn-server --platform "$DOCKER_PLATFORM")
+  log "构建 aitoearn-server 镜像（${DOCKER_PLATFORM:-linux/amd64}，base=${BASE_IMAGE:-alpine}）..."
+  (cd "$BACKEND_DIR" && node scripts/build-docker.mjs aitoearn-server --platform "${DOCKER_PLATFORM:-linux/amd64}")
   docker tag "aitoearn-server:$(date +%Y%m%d)-$(git rev-parse --short HEAD 2>/dev/null || echo latest)" \
              "aitoearn-local/aitoearn-server:latest"
   ok "aitoearn-server 镜像构建完成"
 
-  log "构建 aitoearn-ai 镜像（$DOCKER_PLATFORM，base=$BASE_IMAGE）..."
-  (cd "$BACKEND_DIR" && node scripts/build-docker.mjs aitoearn-ai --platform "$DOCKER_PLATFORM")
+  log "构建 aitoearn-ai 镜像（${DOCKER_PLATFORM:-linux/amd64}，base=${BASE_IMAGE:-alpine}）..."
+  (cd "$BACKEND_DIR" && node scripts/build-docker.mjs aitoearn-ai --platform "${DOCKER_PLATFORM:-linux/amd64}")
   docker tag "aitoearn-ai:$(date +%Y%m%d)-$(git rev-parse --short HEAD 2>/dev/null || echo latest)" \
              "aitoearn-local/aitoearn-ai:latest"
   ok "aitoearn-ai 镜像构建完成"
 
-  log "构建 aitoearn-web 镜像（base=$BASE_IMAGE）..."
+  log "构建 aitoearn-web 镜像（base=${BASE_IMAGE:-alpine}）..."
   # 实时输出前端 pnpm 进度和 docker build 进度（之前用 tail 把输出吃掉了）
   (cd "$WEB_DIR" && pnpm install --frozen-lockfile=false)
-  docker build -t "aitoearn-local/aitoearn-web:latest" --build-arg BASE_IMAGE="$BASE_IMAGE" -f "$WEB_DIR/Dockerfile" "$WEB_DIR"
+  docker build -t "aitoearn-local/aitoearn-web:latest" --build-arg BASE_IMAGE="${BASE_IMAGE:-alpine}" -f "$WEB_DIR/Dockerfile" "$WEB_DIR"
   ok "aitoearn-web 镜像构建完成"
 fi
 
@@ -229,7 +231,7 @@ ${GREEN}部署完成${NC}
   3. 在「注册」Tab 创建第一个账号（密码 8+ 位含字母和数字）
 
 基础镜像切换：
-  - 当前构建: $BASE_IMAGE
+  - 当前构建: ${BASE_IMAGE:-alpine}
   - 切到 Debian: 在 .env 顶部加 BASE_IMAGE=debian 然后重跑脚本
   - 切到 Ubuntu: 在 .env 顶部加 BASE_IMAGE=ubuntu 然后重跑脚本
 
