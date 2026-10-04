@@ -9,6 +9,9 @@ FROM node:24-jammy-slim AS deps-ubuntu
 
 FROM deps-${BASE_IMAGE} AS deps
 
+# BuildKit 不会把全局 ARG 自动带到 stage 内，每个 stage 必须重新声明才能在 RUN shell 里读到
+ARG BASE_IMAGE
+
 RUN if [ "$BASE_IMAGE" = "alpine" ]; then \
       npm install -g pnpm; \
     else \
@@ -31,6 +34,8 @@ FROM node:24-jammy-slim AS prod-ubuntu
 
 FROM prod-${BASE_IMAGE} AS production
 
+# BuildKit 不会把全局 ARG 自动带到 stage 内，每个 stage 必须重新声明才能在 RUN shell 里读到
+ARG BASE_IMAGE
 ARG APP_NAME
 ENV NODE_ENV=production
 ENV APP_NAME=$APP_NAME
