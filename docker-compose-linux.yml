@@ -39,7 +39,7 @@ services:
     image: redis:7.4-alpine
     container_name: aitoearn-redis
     restart: unless-stopped
-    command: redis-server --requirepass 123456
+    command: redis-server --requirepass AitoearnRedis2026
     ports:
       - "6379:6379"
     volumes:
@@ -47,7 +47,7 @@ services:
     networks:
       - aitoearn-network
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "123456", "ping"]
+      test: ["CMD", "redis-cli", "-a", "AitoearnRedis2026", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5

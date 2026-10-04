@@ -17,23 +17,21 @@ auth:
   tokenTtl: 7d
 apiKey:
   prefix: ai_
-# redis:  # 已禁用：docker-compose-linux.yml 中 redis 服务 profiles: [disabled]，外部托管 Redis
-#   host: redis
-#   port: 6379
-#   username: "default"
-#   password: "password"
+redis:
+  host: redis
+  port: 6379
+  password: "AitoearnRedis2026"
 mongodb:
   uri: mongodb://admin:AitoeanMongo2026@mongodb:27017/?authSource=admin&directConnection=true
   dbName: aitoearn
-# redlock:  # 依赖 redis，已禁用
-#   redis:
-#     host: redis
-#     port: 6379
-#     username: "default"
-#     password: "password"
-#   ttl: 300
-#   retryDelay: 1000
-#   retryCount: 3
+redlock:
+  redis:
+    host: redis
+    port: 6379
+    password: "AitoearnRedis2026"
+  ttl: 300
+  retryDelay: 1000
+  retryCount: 3
 assets:
   region: us-east-1
   accessKeyId: rustfsadmin
