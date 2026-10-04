@@ -34,11 +34,9 @@ services:
     networks:
       - aitoearn-network
 
-  # ==================== Redis（禁用，改用外部） ====================
+  # ==================== Redis（独立容器） ====================
   redis:
-    profiles:
-      - disabled
-    image: redis:latest
+    image: redis:7.4-alpine
     container_name: aitoearn-redis
     restart: unless-stopped
     command: redis-server --requirepass 123456
@@ -48,6 +46,12 @@ services:
       - redis-data:/data
     networks:
       - aitoearn-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "123456", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   # ==================== RustFS（不映射端口，避免和 MinIO 冲突） ====================
   rustfs:
@@ -110,7 +114,7 @@ services:
       exit 0;
       "
 
-  # ==================== AI 服务（注释 redis 依赖） ====================
+  # ==================== AI 服务（依赖 redis） ====================
   aitoearn-ai:
     image: aitoearn/aitoearn-ai:latest
     pull_policy: always
@@ -119,8 +123,8 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
-      # redis:                  # ← 注释掉
-      #   condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - ./project/aitoearn-backend/apps/aitoearn-ai/config/config.yaml:/app/config.yaml:rw
     networks:
@@ -132,7 +136,7 @@ services:
       retries: 3
       start_period: 60s
 
-  # ==================== Server 服务（注释 redis 依赖） ====================
+  # ==================== Server 服务（依赖 redis） ====================
   aitoearn-server:
     image: aitoearn/aitoearn-server:latest
     pull_policy: always
@@ -141,8 +145,8 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
-      # redis:                  # ← 注释掉
-      #   condition: service_healthy
+      redis:
+        condition: service_healthy
       aitoearn-ai:
         condition: service_healthy
     volumes:
