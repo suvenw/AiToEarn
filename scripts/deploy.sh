@@ -156,23 +156,25 @@ fi
 # === 构建 ===
 if ! $SKIP_BUILD; then
   log "安装后端依赖（可能需要几分钟）..."
-  (cd "$BACKEND_DIR" && pnpm install --frozen-lockfile=false 2>&1 | tail -5)
+  # 实时输出 pnpm 进度；--prod 跳过 devDependencies（Docker 构建产物不需要），大幅提速
+  (cd "$BACKEND_DIR" && pnpm install --prod --frozen-lockfile=false)
 
   log "构建 aitoearn-server 镜像（$DOCKER_PLATFORM，base=$BASE_IMAGE）..."
-  (cd "$BACKEND_DIR" && node scripts/build-docker.mjs aitoearn-server --platform "$DOCKER_PLATFORM" 2>&1 | tail -3)
+  (cd "$BACKEND_DIR" && node scripts/build-docker.mjs aitoearn-server --platform "$DOCKER_PLATFORM")
   docker tag "aitoearn-server:$(date +%Y%m%d)-$(git rev-parse --short HEAD 2>/dev/null || echo latest)" \
              "aitoearn-local/aitoearn-server:latest"
   ok "aitoearn-server 镜像构建完成"
 
   log "构建 aitoearn-ai 镜像（$DOCKER_PLATFORM，base=$BASE_IMAGE）..."
-  (cd "$BACKEND_DIR" && node scripts/build-docker.mjs aitoearn-ai --platform "$DOCKER_PLATFORM" 2>&1 | tail -3)
+  (cd "$BACKEND_DIR" && node scripts/build-docker.mjs aitoearn-ai --platform "$DOCKER_PLATFORM")
   docker tag "aitoearn-ai:$(date +%Y%m%d)-$(git rev-parse --short HEAD 2>/dev/null || echo latest)" \
              "aitoearn-local/aitoearn-ai:latest"
   ok "aitoearn-ai 镜像构建完成"
 
   log "构建 aitoearn-web 镜像（base=$BASE_IMAGE）..."
-  (cd "$WEB_DIR" && pnpm install --frozen-lockfile=false 2>&1 | tail -3)
-  docker build -t "aitoearn-local/aitoearn-web:latest" --build-arg BASE_IMAGE="$BASE_IMAGE" -f "$WEB_DIR/Dockerfile" "$WEB_DIR" 2>&1 | tail -3
+  # 实时输出前端 pnpm 进度和 docker build 进度（之前用 tail 把输出吃掉了）
+  (cd "$WEB_DIR" && pnpm install --frozen-lockfile=false)
+  docker build -t "aitoearn-local/aitoearn-web:latest" --build-arg BASE_IMAGE="$BASE_IMAGE" -f "$WEB_DIR/Dockerfile" "$WEB_DIR"
   ok "aitoearn-web 镜像构建完成"
 fi
 
