@@ -14,6 +14,12 @@
 #   3. 当前目录是项目根（包含 docker-compose.yml）
 #
 
+# 兜底：被 `sh scripts/deploy.sh` 调用时（Ubuntu/Debian 的 /bin/sh 是 dash，
+#       不支持 `set -o pipefail`），自动切到 bash 重新执行自己。
+if [ -z "${BASH_VERSION:-}" ]; then
+  exec /usr/bin/env bash "$0" "$@"
+fi
+
 set -euo pipefail
 
 # === 路径与常量 ===
