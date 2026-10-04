@@ -93,6 +93,22 @@ docker compose up -d
 
 **到这里，你已经可以正常使用 AiToEarn 了！** 🎉
 
+## 🐧 Linux 服务器部署
+
+在 Linux 服务器（特别是 Ubuntu 22.04+ / Debian 12+ 等较新内核）上，请改用 `docker-compose-linux.yml`，与默认 compose 的关键差异：
+
+- MongoDB 锁定到 `mongo:8.0.4`，通过环境变量 `GLIBC_TUNABLES=glibc.pthread.rseq=1` 避免新内核下崩溃
+- MongoDB root 密码为 `AitoeanMongo2026`，`aitoearn-ai` / `aitoearn-server` 的 `config.yaml` 已同步修改
+- `redis` 服务被禁用（`profiles: [disabled]`），后端 `config.yaml` 中 Redis 段已注释掉；如需启用 Redis，请同步打开 compose 和 `config.yaml` 中的 Redis 配置
+- `aitoearn-web` 启动命令保留 `AUTO_LOGIN_TOKEN` 读取校验，`aitoearn-init` 失败时 web 会显式退出
+
+启动命令：
+
+```bash
+docker compose -f docker-compose-linux.yml up -d
+docker compose -f docker-compose-linux.yml ps
+```
+
 ## 运维参考
 
 ### 自动登录

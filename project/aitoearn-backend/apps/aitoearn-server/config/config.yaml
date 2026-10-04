@@ -17,23 +17,23 @@ auth:
   tokenTtl: 7d
 apiKey:
   prefix: ai_
-redis:
-  host: redis
-  port: 6379
-  username: "default"
-  password: "password"
+# redis:  # 已禁用：docker-compose-linux.yml 中 redis 服务 profiles: [disabled]，外部托管 Redis
+#   host: redis
+#   port: 6379
+#   username: "default"
+#   password: "password"
 mongodb:
-  uri: mongodb://admin:password@mongodb:27017/?authSource=admin&directConnection=true
+  uri: mongodb://admin:AitoeanMongo2026@mongodb:27017/?authSource=admin&directConnection=true
   dbName: aitoearn
-redlock:
-  redis:
-    host: redis
-    port: 6379
-    username: "default"
-    password: "password"
-  ttl: 300
-  retryDelay: 1000
-  retryCount: 3
+# redlock:  # 依赖 redis，已禁用
+#   redis:
+#     host: redis
+#     port: 6379
+#     username: "default"
+#     password: "password"
+#   ttl: 300
+#   retryDelay: 1000
+#   retryCount: 3
 assets:
   region: us-east-1
   accessKeyId: rustfsadmin
@@ -50,7 +50,7 @@ aiClient:
   token: ce5cb74f18ea0cbd50fc67b2779a224025073d9b3160799cc4a24110565918cd
 channel:
   channelDb:
-    uri: mongodb://admin:password@mongodb:27017/?authSource=admin&directConnection=true
+    uri: mongodb://admin:AitoeanMongo2026@mongodb:27017/?authSource=admin&directConnection=true
     dbName: aitoearn_channel
   shortLink:
     baseUrl: https://localhost/api/shortLink/

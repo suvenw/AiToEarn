@@ -93,6 +93,22 @@ China keys must use `https://aitoearn.cn/api`, and international keys must use `
 
 **You're all set!** 🎉
 
+## 🐧 Linux Server Deployment
+
+On Linux servers (especially Ubuntu 22.04+ / Debian 12+ with newer kernels), use `docker-compose-linux.yml` instead. Key differences from the default compose:
+
+- MongoDB is pinned to `mongo:8.0.4`; the `GLIBC_TUNABLES=glibc.pthread.rseq=1` env var avoids crashes on newer kernels
+- MongoDB root password is `AitoeanMongo2026`; the `aitoearn-ai` / `aitoearn-server` `config.yaml` files are updated to match
+- The `redis` service is disabled (`profiles: [disabled]`); Redis sections in backend `config.yaml` are commented out. To re-enable Redis, uncomment both the compose and `config.yaml` Redis blocks
+- `aitoearn-web` keeps the `AUTO_LOGIN_TOKEN` read-and-check command; the web container exits loudly if `aitoearn-init` failed to produce a token
+
+Start command:
+
+```bash
+docker compose -f docker-compose-linux.yml up -d
+docker compose -f docker-compose-linux.yml ps
+```
+
 ## Operations Reference
 
 ### Auto-Login
