@@ -163,15 +163,22 @@ if ! $SKIP_BUILD; then
 
   log "构建 aitoearn-server 镜像（${DOCKER_PLATFORM:-linux/amd64}，base=${BASE_IMAGE:-alpine}）..."
   (cd "$BACKEND_DIR" && node scripts/build-docker.mjs aitoearn-server --platform "${DOCKER_PLATFORM:-linux/amd64}")
-  docker tag "aitoearn-server:$(date +%Y%m%d)-$(git rev-parse --short HEAD 2>/dev/null || echo latest)" \
-             "aitoearn-local/aitoearn-server:latest"
-  ok "aitoearn-server 镜像构建完成"
+  # 从 docker images 读取刚 build 出来的 tag（不自己再算一次 date+git hash，避免与 build-docker.mjs 算出不一致）
+  SERVER_TAG=$(docker images --format '{{.Tag}}' aitoearn-server | grep -E '^[0-9]{8}-[0-9a-f]{7,}$' | head -1)
+  if [ -z "$SERVER_TAG" ]; then
+    die "未找到 aitoearn-server 镜像（构建可能未产生 tag）"
+  fi
+  docker tag "aitoearn-server:$SERVER_TAG" "aitoearn-local/aitoearn-server:latest"
+  ok "aitoearn-server 镜像构建完成（tag=$SERVER_TAG）"
 
   log "构建 aitoearn-ai 镜像（${DOCKER_PLATFORM:-linux/amd64}，base=${BASE_IMAGE:-alpine}）..."
   (cd "$BACKEND_DIR" && node scripts/build-docker.mjs aitoearn-ai --platform "${DOCKER_PLATFORM:-linux/amd64}")
-  docker tag "aitoearn-ai:$(date +%Y%m%d)-$(git rev-parse --short HEAD 2>/dev/null || echo latest)" \
-             "aitoearn-local/aitoearn-ai:latest"
-  ok "aitoearn-ai 镜像构建完成"
+  AI_TAG=$(docker images --format '{{.Tag}}' aitoearn-ai | grep -E '^[0-9]{8}-[0-9a-f]{7,}$' | head -1)
+  if [ -z "$AI_TAG" ]; then
+    die "未找到 aitoearn-ai 镜像（构建可能未产生 tag）"
+  fi
+  docker tag "aitoearn-ai:$AI_TAG" "aitoearn-local/aitoearn-ai:latest"
+  ok "aitoearn-ai 镜像构建完成（tag=$AI_TAG）"
 
   log "构建 aitoearn-web 镜像（base=${BASE_IMAGE:-alpine}）..."
   # 实时输出前端 pnpm 进度和 docker build 进度（之前用 tail 把输出吃掉了）
